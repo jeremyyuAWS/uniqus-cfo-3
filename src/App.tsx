@@ -1,29 +1,28 @@
 import React, { useState } from 'react';
 import { Layout } from './components/Layout';
-import { AgentHub } from './components/tabs/AgentHub';
-import { OGISuperAgent } from './components/tabs/OGISuperAgent';
-import { Analytics } from './components/tabs/Analytics';
-import { AboutOGI } from './components/tabs/AboutOGI';
+import { Discover } from './components/tabs/Discover';
+import { Analyze } from './components/tabs/Analyze';
+import { Strategize } from './components/tabs/Strategize';
+import { Validate } from './components/tabs/Validate';
 
 function App() {
   const [activeTab, setActiveTab] = useState<number>(0);
 
   const tabs = [
-    { id: 0, name: 'Agent Hub', component: <AgentHub /> },
-    { id: 1, name: 'OGI Super Agent', component: <OGISuperAgent /> },
-    { id: 2, name: 'Analytics', component: <Analytics /> },
-    { id: 3, name: 'About OGI', component: <AboutOGI /> },
+    { id: 0, name: 'Discover', component: <Discover /> },
+    { id: 1, name: 'Analyze', component: <Analyze /> },
+    { id: 2, name: 'Strategize', component: <Strategize /> },
+    { id: 3, name: 'Validate', component: <Validate /> },
   ];
 
   return (
     <Layout>
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-          CFO AI Agent Hub
+          CVC Vision
         </h1>
         <p className="text-lg text-gray-700 mb-8 max-w-3xl">
-          Organizational General Intelligence (OGI) for enterprise finance leaders, 
-          orchestrating AI agents for analytics, compliance, and automation.
+          AI-Powered Foresight for Bold Investments
         </p>
         
         <div className="border-b border-gray-200 mb-6">
