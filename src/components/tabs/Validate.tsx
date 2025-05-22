@@ -1,288 +1,160 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { HelpCircle, MessageSquare, FileCheck, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Send, Loader2 } from 'lucide-react';
 
 export const Validate: React.FC = () => {
-  const [showInfoModal, setShowInfoModal] = useState(false);
-  const [message, setMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [input, setInput] = useState('');
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([
-    { role: 'assistant', content: 'Welcome to the Expert Validation interface. I can help you validate your CVC investment thesis, compare technologies, or provide expert perspectives on market trends. What would you like to validate today?' }
+    { 
+      role: 'agent', 
+      content: 'I can help validate your investment thesis for AI companies. What specific company or aspect would you like me to analyze?' 
+    }
   ]);
-  
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-  
   const handleSendMessage = () => {
-    if (!message.trim()) return;
+    if (!input.trim()) return;
     
-    const userMessage = { role: 'user', content: message };
+    const userMessage = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
-    setMessage('');
+    setInput('');
     setIsTyping(true);
     
     // Simulate AI response
     setTimeout(() => {
-      const botResponse = getBotResponse(message);
-      setMessages(prev => [...prev, { role: 'assistant', content: botResponse }]);
+      const response = getAIResponse(input);
+      setMessages(prev => [...prev, { role: 'agent', content: response }]);
       setIsTyping(false);
     }, 1500);
   };
-  
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
-  
-  const getBotResponse = (userMessage: string) => {
-    const lowerMessage = userMessage.toLowerCase();
+
+  // Simple AI response simulation
+  const getAIResponse = (message: string) => {
+    const lowerMessage = message.toLowerCase();
     
     if (lowerMessage.includes('anthropic') && (lowerMessage.includes('risk') || lowerMessage.includes('concern'))) {
-      return 'Based on my analysis of Anthropic, the primary risks to validate include:\n\n1. Competitive Position: OpenAI maintains a significant first-mover advantage with widespread GPT adoption. Anthropic will need to differentiate based on safety and reliability, not just raw capabilities.\n\n2. Business Model Risk: Anthropic\'s current API-based business model faces pricing pressure from open source models and larger competitors who can operate at lower margins.\n\n3. Regulatory Uncertainty: While Anthropic\'s safety-focused approach may be advantageous in a regulated environment, shifting regulatory landscapes could impact go-to-market timelines.\n\n4. Talent Retention: AI talent remains highly competitive, and Anthropic will need to maintain its team despite aggressive recruiting from tech giants.\n\nI recommend conducting technical due diligence specifically on their Constitutional AI approach and requesting detailed unit economics for their API business to validate the sustainability of their financial model.';
+      return 'Based on my analysis of Anthropic, the primary risks to validate include:\n\n1. Competitive Position: OpenAI maintains a significant first-mover advantage with widespread GPT adoption. Anthropic will need to differentiate based on safety and reliability, not just raw capabilities.\n\n2. Business Model Risk: Anthropic\'s current API-based business model faces pricing pressure from open source models and larger competitors who can operate at lower margins.\n\n3. Regulatory Uncertainty: While Anthropic\'s safety-focused approach may be advantageous in a regulated environment, the timing and scope of AI regulation remains unpredictable, creating execution uncertainty.\n\n4. Talent Retention: The company\'s ability to retain key AI researchers in a competitive talent market will be crucial for maintaining its technical edge.\n\nWould you like me to elaborate on any of these risk factors or suggest validation approaches?';
     } else if (lowerMessage.includes('anthropic') && lowerMessage.includes('valuation')) {
-      return 'Anthropic\'s current $4.1B valuation reflects strong investor confidence, but requires validation against several benchmarks:\n\n1. Comparable Companies: The valuation represents a ~30x multiple on estimated 2024 revenue, which is high but in-line with leading AI companies. OpenAI\'s recent valuation was ~50x revenue, while Cohere is ~20x.\n\n2. Growth Trajectory: Anthropic is projecting 200-250% YoY growth for the next 3 years. If achieved, the current valuation represents a more reasonable 8-10x multiple on projected 2026 revenue.\n\n3. Strategic Value: Beyond financial metrics, Anthropic has strategic value through its safety-focused approach and technical talent pool. Their Constitutional AI approach could be particularly valuable as regulatory pressure increases.\n\n4. Downside Protection: Recent funding rounds included significant corporate strategic investors (Google, Salesforce) with commercial agreements that provide baseline revenue guarantees.\n\nWhile the valuation reflects current AI market enthusiasm, it can be justified if Anthropic maintains its growth trajectory and successfully differentiates through its safety-first approach.';
-    } else if (lowerMessage.includes('compare') && (lowerMessage.includes('anthropic') || lowerMessage.includes('claude'))) {
-      return 'Comparison of Leading LLM Providers:\n\n**Anthropic (Claude)**\n• Technical Approach: Constitutional AI, RLHF\n• Differentiator: Safety, reliability, context length (100K tokens)\n• Enterprise Focus: High, with specific safety features\n• Pricing: Premium tier with competitive enterprise rates\n• Ecosystem: Growing, with key partners like Notion, Quora\n\n**OpenAI (GPT-4)**\n• Technical Approach: RLHF, multimodal pre-training\n• Differentiator: First-mover, multimodal capabilities\n• Enterprise Focus: High, with significant Microsoft integration\n• Pricing: Premium with high adoption\n• Ecosystem: Largest, most developed ecosystem\n\n**Cohere**\n• Technical Approach: Specialized command models\n• Differentiator: Enterprise customization, multilingual\n• Enterprise Focus: Very high, B2B primary focus\n• Pricing: Enterprise-focused with flexible deployment\n• Ecosystem: Growing with targeted enterprise use cases\n\nAnthropics's key advantage is its safety-first approach, making it potentially better suited for regulated industries or critical applications where reliability and explainability are paramount. However, OpenAI currently leads in general capabilities and ecosystem adoption.';
-    } else if (lowerMessage.includes('anthropic') && lowerMessage.includes('recommend')) {
-      return 'Based on our analysis and validation process, I recommend proceeding with a strategic investment in Anthropic with the following approach:\n\n1. Investment Thesis: Anthropic represents a strong strategic fit for enhancing your AI capabilities while aligning with responsible AI principles. Their safety-focused approach differentiates them in an increasingly competitive market.\n\n2. Recommended Structure:\n   • Investment Size: $5-10M range\n   • Target: Secondary shares or participation in upcoming funding round\n   • Commercial Agreement: Secure favorable API access and early product roadmap visibility\n\n3. Value Creation Levers:\n   • Technology Access: Early access to Claude models for internal application development\n   • Strategic Insight: Regular briefings on AI safety and governance approaches\n   • Ecosystem Positioning: Potential to connect with other enterprise customers\n\n4. Risks to Monitor:\n   • Funding Environment: Be prepared for down-round protection if AI funding cools\n   • Technical Differentiation: Validate ongoing differentiation vs. open-source alternatives\n   • Enterprise Go-to-Market: Track their ability to build enterprise-ready features and security\n\nThis recommendation is supported by multiple expert validations, including our technical AI research team and analysis of comparable strategic CVC investments in the AI sector.';
+      return 'Anthropic\'s current $4.1B valuation reflects strong investor confidence, but requires validation against several benchmarks:\n\n1. Comparable Companies: The valuation represents a ~30x multiple on estimated 2024 revenue, which is high but in-line with leading AI companies. OpenAI\'s recent valuation was ~50x revenue, while Cohere is ~20x.\n\n2. Growth Trajectory: Anthropic is projecting 200-250% YoY growth for the next 3 years. If achieved, the current valuation represents a more reasonable 8-10x multiple on projected 2026 revenue.\n\n3. Strategic Value: Beyond financial metrics, Anthropic has strategic value through its safety-focused approach and technical talent that could justify a premium in acquisition scenarios.\n\n4. Monetization Potential: The company\'s ability to convert its technical advantages into sustainable revenue streams remains unproven but early enterprise adoption signals are positive.\n\nWould you like me to analyze specific aspects of this valuation in more detail?';
+    } else if (lowerMessage.includes('anthropic') && lowerMessage.includes('competitive')) {
+      return 'Anthropic\'s competitive position can be validated across several dimensions:\n\n1. Technical Capabilities: Claude 3 benchmarks show competitive performance with GPT-4, particularly in reasoning, safety, and instruction-following. However, OpenAI maintains advantages in coding and certain specialized tasks.\n\n2. Safety Differentiation: Anthropic\'s Constitutional AI approach provides meaningful differentiation for enterprise customers with high safety and alignment requirements. This is a legitimate competitive moat if properly monetized.\n\n3. Enterprise Readiness: Early enterprise customers report strong satisfaction with Claude\'s reliability, reduced hallucinations, and longer context windows. These factors support Anthropic\'s ability to compete effectively in the enterprise segment.\n\n4. Market Timing: Anthropic is well-positioned as a strong "second player" in a market that likely won't be winner-take-all. Many enterprises specifically seek multi-vendor AI strategies to reduce dependency risks.\n\nWould you like me to elaborate on any specific competitive dimension?';
+    } else if (lowerMessage.includes('anthropic') && lowerMessage.includes('team')) {
+      return 'Anthropic\'s team represents one of its strongest assets and can be validated through several lenses:\n\n1. Leadership: Founded by Dario Amodei (CEO) and several other former OpenAI researchers, including some who led GPT-3 development. This founding team brings critical technical expertise and credibility.\n\n2. Research Talent: The company has attracted top AI safety researchers from Google, DeepMind, and academia. Their research publication record demonstrates continued thought leadership in alignment and safety.\n\n3. Engineering Execution: The team has demonstrated strong execution by releasing multiple Claude models with competitive capabilities despite having significantly fewer resources than OpenAI or Google.\n\n4. Business Development: Recent executive hires from enterprise software companies strengthen Anthropic\'s ability to commercialize its technology effectively.\n\n5. Culture: The company maintains a research-oriented culture with strong emphasis on safety, which helps attract and retain talent aligned with its mission.\n\nWould you like me to analyze any specific aspect of the team in more detail?';
+    } else if (lowerMessage.includes('anthropic')) {
+      return 'Anthropic is a leading AI safety company founded in 2021 by former OpenAI researchers. Their flagship product is Claude, a large language model designed with a focus on safety, helpfulness, and harmlessness.\n\nKey investment validation points:\n\n1. Technology: Claude 3 models demonstrate competitive performance with GPT-4 on most benchmarks, with particular strengths in reasoning, instruction-following, and reduced hallucinations.\n\n2. Market Position: Positioned as the leading safety-focused alternative to OpenAI, with strong enterprise adoption including Zoom, Notion, Quora, and DuckDuckGo.\n\n3. Growth: Revenue is growing at 200%+ YoY with strong unit economics as API usage scales.\n\n4. Funding: Well-capitalized with $750M+ raised from Google, Salesforce, and other strategic investors.\n\n5. Differentiation: Constitutional AI approach provides meaningful technical and market differentiation in safety and alignment.\n\nWhat specific aspect of Anthropic would you like me to validate further?';
+    } else if (lowerMessage.includes('cohere') && (lowerMessage.includes('risk') || lowerMessage.includes('concern'))) {
+      return 'Based on my analysis of Cohere, the key risks to validate include:\n\n1. Competitive Differentiation: Cohere faces intense competition from both larger players (OpenAI, Anthropic) and open-source alternatives. Their enterprise focus is sound but requires clearer technical differentiation.\n\n2. Go-to-Market Execution: As a smaller player, Cohere\'s ability to scale enterprise sales against well-funded competitors with strong brand recognition presents execution risk.\n\n3. Capital Requirements: Building and training frontier models requires significant ongoing capital. Cohere\'s funding ($435M to date) may be insufficient to keep pace with larger competitors.\n\n4. Talent Retention: While the founding team is strong (ex-Google Brain), retaining top AI talent against competitors with deeper pockets remains challenging.\n\n5. Enterprise Adoption Timeline: Enterprise sales cycles are lengthy, and Cohere\'s runway depends on accelerating adoption.\n\nWould you like me to elaborate on any of these risk factors?';
+    } else if (lowerMessage.includes('cohere')) {
+      return 'Cohere is an enterprise-focused AI company founded in 2019 by former Google Brain researchers. They specialize in developing large language models optimized for business applications.\n\nKey investment validation points:\n\n1. Technology: Their Command and Embed models show strong performance for enterprise use cases, particularly in RAG applications and document processing.\n\n2. Enterprise Focus: Clear strategic focus on enterprise applications rather than competing directly in consumer AI.\n\n3. Differentiation: Specialized in multilingual capabilities and connectors for enterprise data systems.\n\n4. Partnerships: Strategic partnership with Oracle provides valuable enterprise distribution channels.\n\n5. Team: Founded by notable NLP researchers from Google Brain with strong technical credentials.\n\nWhat specific aspect of Cohere would you like me to validate further?';
+    } else if (lowerMessage.includes('stability ai') && (lowerMessage.includes('risk') || lowerMessage.includes('concern'))) {
+      return 'Based on my analysis of Stability AI, the key risks to validate include:\n\n1. Business Model Uncertainty: Stability has pivoted multiple times, from open-source focus to enterprise products to consumer apps. This suggests strategic uncertainty.\n\n2. Competitive Pressure: In image generation, they face intense competition from Midjourney (superior quality), OpenAI (integration advantages), and open-source alternatives.\n\n3. Governance Concerns: Reports of internal conflicts and leadership issues raise questions about operational execution.\n\n4. Funding Challenges: Recent funding rounds have reportedly come at lower valuations, indicating potential investor concerns.\n\n5. Regulatory Exposure: Their early approach to training on broad internet data without clear opt-out mechanisms creates potential copyright and regulatory exposure.\n\nWould you like me to elaborate on any of these risk factors?';
+    } else if (lowerMessage.includes('stability ai')) {
+      return 'Stability AI is a generative AI company founded in 2020, best known for developing Stable Diffusion, an open-source image generation model.\n\nKey investment validation points:\n\n1. Technology: Pioneered open-source high-quality image generation with Stable Diffusion, and has expanded into video, 3D, and audio generation.\n\n2. Distribution: Their open-source approach created massive adoption and developer community, though monetization has proven challenging.\n\n3. Product Portfolio: Has expanded beyond image generation to multimodal models, including Stable Audio and Stable Video.\n\n4. Market Position: Established brand in generative media, but faces intense competition from Midjourney, OpenAI, and others.\n\n5. Enterprise Strategy: Shifting toward enterprise applications and API services for monetization.\n\nWhat specific aspect of Stability AI would you like me to validate further?';
+    } else if (lowerMessage.includes('mistral') && (lowerMessage.includes('risk') || lowerMessage.includes('concern'))) {
+      return 'Based on my analysis of Mistral AI, the key risks to validate include:\n\n1. Competitive Dynamics: While Mistral has impressive technical capabilities, they face intense competition from both established players and other well-funded startups in an increasingly crowded market.\n\n2. Open-Source Strategy Tensions: Their hybrid approach of releasing some models as open-source while keeping others proprietary creates potential strategic tensions and community expectations.\n\n3. Monetization Challenges: Converting technical excellence into sustainable revenue streams remains unproven, particularly as model capabilities become increasingly commoditized.\n\n4. Regulatory Environment: As a European AI company, Mistral faces evolving EU AI Act compliance requirements, though their location could also be advantageous for certain customers.\n\n5. Scaling Operations: Rapidly scaling from research excellence to commercial operations presents execution challenges, particularly in enterprise sales and support.\n\nWould you like me to elaborate on any of these risk factors?';
+    } else if (lowerMessage.includes('mistral')) {
+      return 'Mistral AI is a French AI company founded in 2023 by former DeepMind and Meta AI researchers. They develop large language models with a focus on efficiency and a hybrid open-source/commercial approach.\n\nKey investment validation points:\n\n1. Technical Efficiency: Mistral models demonstrate impressive performance-to-parameter ratios, achieving near-frontier capabilities with smaller, more efficient models.\n\n2. Team: Founded by recognized AI researchers including Arthur Mensch (CEO), Guillaume Lample, and Timothée Lacroix, bringing experience from Meta AI and DeepMind.\n\n3. Funding: Raised over €385M at a €2B valuation in record time, demonstrating strong investor confidence.\n\n4. European Position: Well-positioned as Europe\'s leading AI model provider, with potential regulatory advantages in EU markets.\n\n5. Open-Source Strategy: Their approach of releasing smaller models as open-source while commercializing larger models creates community goodwill while preserving commercial upside.\n\nWhat specific aspect of Mistral AI would you like me to validate further?';
+    } else if (lowerMessage.includes('inflection') && (lowerMessage.includes('risk') || lowerMessage.includes('concern'))) {
+      return 'Based on my analysis of Inflection AI, the key risks to validate include:\n\n1. Product-Market Fit: Pi, their consumer-facing assistant, has not demonstrated clear differentiation or mass adoption despite technical quality. The pivot to Microsoft raises questions about their original B2C strategy.\n\n2. Strategic Direction: The recent acquisition of core team members by Microsoft, while maintaining Inflection as a separate entity, creates uncertainty about the company\'s future direction and independence.\n\n3. Competitive Positioning: Inflection faces intense competition from both larger players (OpenAI, Anthropic) and numerous well-funded startups in an increasingly crowded market.\n\n4. Capital Intensity: Their approach of building proprietary infrastructure and models requires substantial ongoing capital, creating potential funding challenges despite their strong initial raise.\n\n5. Team Continuity: With key technical leaders now at Microsoft, the company\'s ability to maintain technical excellence and execute on its vision may be compromised.\n\nWould you like me to elaborate on any of these risk factors?';
+    } else if (lowerMessage.includes('inflection')) {
+      return 'Inflection AI is an AI company founded in 2022 by Reid Hoffman, Mustafa Suleyman (former DeepMind co-founder), and Karen Simonyan. They developed Pi, a personal AI assistant, before a major strategic shift in 2024.\n\nKey investment validation points:\n\n1. Recent Transition: In March 2024, Microsoft hired key Inflection team members including Suleyman and Simonyan, while Inflection continues as a separate entity with a license to its technology.\n\n2. Technology: Their Inflection-2 model demonstrated competitive performance with leading models like GPT-4 and Claude 2.\n\n3. Infrastructure: Built significant AI infrastructure including a large compute cluster with thousands of NVIDIA GPUs.\n\n4. Funding: Raised $1.3B from Microsoft, Nvidia, and other investors at a reported $4B valuation before the Microsoft transition.\n\n5. Strategic Value: Despite organizational changes, the company\'s IP, infrastructure, and remaining team retain significant value.\n\nWhat specific aspect of Inflection AI would you like me to validate further?';
+    } else if (lowerMessage.includes('perplexity') && (lowerMessage.includes('risk') || lowerMessage.includes('concern'))) {
+      return 'Based on my analysis of Perplexity AI, the key risks to validate include:\n\n1. Differentiation Sustainability: While Perplexity has created an innovative search experience, the core technology (RAG with LLMs) is becoming increasingly commoditized. Major search engines and startups are rapidly deploying similar capabilities.\n\n2. Content Licensing and Legal Exposure: Their approach of retrieving and summarizing content from across the web creates potential copyright and licensing issues, particularly as publishers become more aggressive about AI content usage.\n\n3. Unit Economics: The cost structure of serving AI-powered search results (requiring multiple API calls to models like GPT-4) creates challenging unit economics that may be difficult to offset with current monetization approaches.\n\n4. Competitive Response: Google, Microsoft, and other search incumbents with vastly more resources are rapidly incorporating similar AI capabilities, potentially limiting Perplexity\'s growth runway.\n\n5. Monetization Challenges: Converting free users to paid subscribers at sufficient scale remains unproven, particularly as free alternatives improve.\n\nWould you like me to elaborate on any of these risk factors?';
+    } else if (lowerMessage.includes('perplexity')) {
+      return 'Perplexity AI is a search engine and answer engine founded in 2022 that uses AI to provide direct answers to user queries with cited sources.\n\nKey investment validation points:\n\n1. Product Innovation: Created a new search paradigm that directly answers questions using AI with source attribution, reducing the need to visit multiple websites.\n\n2. Growth: Reported 10M+ monthly active users with strong organic growth and user engagement metrics.\n\n3. Team: Founded by former Quora, Meta, and Databricks employees with strong technical backgrounds.\n\n4. Funding: Raised $73.6M from NEA, Databricks Ventures, and others at a $520M valuation, with a recent round led by IVP at a reported $1B+ valuation.\n\n5. Monetization: Launched Perplexity Pro subscription ($20/month) with access to more powerful models and features.\n\nWhat specific aspect of Perplexity AI would you like me to validate further?';
+    } else if (lowerMessage.includes('ai21') && (lowerMessage.includes('risk') || lowerMessage.includes('concern'))) {
+      return 'Based on my analysis of AI21 Labs, the key risks to validate include:\n\n1. Competitive Positioning: AI21 faces intense competition from both larger players (OpenAI, Anthropic, Google) and well-funded startups with similar enterprise focus (Cohere, Mistral). Their technical differentiation is less clear than some competitors.\n\n2. Model Performance Gap: While Jamba shows improvements over previous AI21 models, independent benchmarks suggest it still lags behind frontier models from OpenAI and Anthropic in several key capabilities.\n\n3. Go-to-Market Execution: As a smaller player, AI21\'s ability to build enterprise sales channels and support infrastructure at scale presents execution risk.\n\n4. Capital Requirements: Continuing to develop competitive foundation models requires substantial ongoing capital. Despite strong funding, AI21 has raised less than several key competitors.\n\n5. Product-Market Fit: Their pivot from consumer applications (Wordtune) toward enterprise API services indicates potential challenges in finding sustainable product-market fit.\n\nWould you like me to elaborate on any of these risk factors?';
+    } else if (lowerMessage.includes('ai21')) {
+      return 'AI21 Labs is an AI company founded in 2017 by Yoav Shoham, Ori Goshen, and Amnon Shashua. They develop large language models and AI applications with a focus on enterprise use cases.\n\nKey investment validation points:\n\n1. Technology: Their Jamba model family shows competitive performance for enterprise applications, with particular strengths in reasoning and factuality.\n\n2. Enterprise Focus: Clear strategic focus on enterprise applications and domain-specific solutions rather than competing directly in consumer AI.\n\n3. Team: Founded by renowned AI researchers and entrepreneurs with strong technical and business backgrounds.\n\n4. Funding: Raised over $300M from investors including Nvidia, Google, and Salesforce at a reported $1.4B valuation.\n\n5. Product Portfolio: Expanded beyond foundation models to specialized solutions like Wordtune (writing assistant) and enterprise-specific implementations.\n\nWhat specific aspect of AI21 Labs would you like me to validate further?';
+    } else if (lowerMessage.includes('runway') && (lowerMessage.includes('risk') || lowerMessage.includes('concern'))) {
+      return 'Based on my analysis of Runway, the key risks to validate include:\n\n1. Competitive Intensity: The generative video space is becoming increasingly crowded with both startups (Pika, Stability) and large companies (OpenAI, Google, Meta) releasing competitive products with massive resources.\n\n2. Compute Economics: Generative video is extremely compute-intensive, creating challenging unit economics that may be difficult to support with current pricing models, particularly as usage scales.\n\n3. Enterprise Adoption Timeline: While creative professionals are embracing the technology, broader enterprise adoption may take longer than anticipated, affecting growth projections.\n\n4. Copyright and Legal Exposure: Training on video datasets creates potential copyright issues, particularly as legal precedents around generative AI and copyright continue to evolve.\n\n5. Monetization Strategy: Current pricing models may face pressure as competitors enter the market and capabilities become more commoditized.\n\nWould you like me to elaborate on any of these risk factors?';
+    } else if (lowerMessage.includes('runway')) {
+      return 'Runway is an AI company founded in 2018 that specializes in generative AI tools for video creation, editing, and visual effects.\n\nKey investment validation points:\n\n1. Product Innovation: Pioneered accessible generative video with Gen-1 and Gen-2, establishing early leadership in a rapidly growing category.\n\n2. Creator Adoption: Strong traction among creative professionals, with usage by major studios, production companies, and independent creators.\n\n3. Team: Founded by Cristóbal Valenzuela, Anastasis Germanidis, and Alejandro Matamala, combining technical expertise with creative industry understanding.\n\n4. Funding: Raised $237M from NVIDIA, Salesforce Ventures, and others at a reported $1.5B+ valuation.\n\n5. Business Model: Established SaaS subscription model with tiered pricing that has demonstrated strong conversion from free to paid users.\n\nWhat specific aspect of Runway would you like me to validate further?';
+    } else if (lowerMessage.includes('hugging face') && (lowerMessage.includes('risk') || lowerMessage.includes('concern'))) {
+      return 'Based on my analysis of Hugging Face, the key risks to validate include:\n\n1. Monetization Challenges: Their open-source foundation and community focus creates tension with monetization needs. Enterprise revenue growth must accelerate to justify the $4.5B valuation.\n\n2. Strategic Focus: The company operates across multiple domains (model hosting, enterprise solutions, research, community platform) which may dilute focus and execution.\n\n3. Competitive Pressure: Cloud providers are increasingly offering similar model hosting and deployment services with deeper integration into their ecosystems.\n\n4. Talent Retention: As a hub for AI talent, retaining key technical staff amid aggressive recruiting from larger companies presents an ongoing challenge.\n\n5. Open-Source Dynamics: While open-source is their strength, it also means many of their innovations can be freely adopted by competitors, potentially limiting defensibility.\n\nWould you like me to elaborate on any of these risk factors?';
+    } else if (lowerMessage.includes('hugging face')) {
+      return 'Hugging Face is an AI company founded in 2016 that has evolved from a chatbot startup into the leading platform for open-source AI models, tools, and datasets.\n\nKey investment validation points:\n\n1. Platform Dominance: Established as the "GitHub of machine learning" with over 350,000 models and 30,000+ organizations using their platform.\n\n2. Community Leadership: Built the largest AI open-source community with millions of monthly users and strong developer loyalty.\n\n3. Enterprise Traction: Enterprise offering has gained significant traction with customers including Amazon, Google, Microsoft, and numerous Fortune 500 companies.\n\n4. Team: Founded by Clément Delangue, Julien Chaumond, and Thomas Wolf, combining technical expertise with community-building skills.\n\n5. Funding: Raised $235M from investors including Salesforce, Amazon, Google, and Nvidia at a reported $4.5B valuation.\n\nWhat specific aspect of Hugging Face would you like me to validate further?';
     } else {
-      return 'Thank you for your question. To provide the most accurate validation, I\'d like to understand more about your specific concerns. \n\nAs an expert validation system, I can help with:\n\n1. Technology assessment and verification of claims\n2. Market size and growth validation\n3. Competitive landscape analysis\n4. Due diligence support for specific companies\n5. Investment thesis stress-testing\n\nCould you please provide more details about what specific aspect you\'d like me to validate? For example, are you interested in validating Anthropic\'s technical capabilities, their market position, or perhaps comparing multiple companies in the generative AI space?';
+      return 'I can help validate investment theses for various AI companies. You can ask me about specific companies like Anthropic, Cohere, Stability AI, Mistral AI, Inflection AI, Perplexity, AI21 Labs, Runway, or Hugging Face.\n\nFor each company, I can provide insights on:\n- Overall investment validation points\n- Specific risk factors and concerns\n- Competitive positioning\n- Team assessment\n- Valuation considerations\n\nWhich company or aspect would you like me to analyze?';
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Validate</h2>
-          <p className="text-gray-600 mt-1">Expert validation and due diligence for investment decisions.</p>
-        </div>
-        <button 
-          onClick={() => setShowInfoModal(!showInfoModal)}
-          className="text-gray-500 hover:text-gray-700 focus:outline-none"
-        >
-          <HelpCircle className="w-5 h-5" />
-        </button>
+      <div className="flex flex-col space-y-2">
+        <h2 className="text-2xl font-bold text-gray-900">Validate</h2>
+        <p className="text-gray-600">
+          Validate investment theses with AI-powered analysis of competitive positioning, market dynamics, and risk factors.
+        </p>
       </div>
 
-      {showInfoModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 animate-fade-in">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-semibold text-gray-900">About Validate</h3>
-              <button 
-                onClick={() => setShowInfoModal(false)}
-                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+      <div className="bg-white rounded-lg shadow-md p-4 h-[600px] flex flex-col">
+        <div className="flex-grow overflow-y-auto p-4 space-y-4">
+          {messages.map((message, index) => (
+            <div 
+              key={index} 
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                  message.role === 'user' 
+                    ? 'bg-gray-200 text-gray-800' 
+                    : 'bg-gray-100 text-gray-800'
+                }`}
               >
-                <span className="text-2xl">&times;</span>
-              </button>
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              </motion.div>
             </div>
-            <div className="space-y-3 text-gray-600">
-              <p>The <span className="font-medium text-gray-800">Validate</span> tab connects CVC teams with expert AI validation to verify investment theses, perform due diligence, and generate credible investment documentation.</p>
-              <div>
-                <h4 className="text-lg font-medium text-gray-800 mb-1">Key Features:</h4>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Expert-level AI validation of investment theses</li>
-                  <li>Technology claims verification</li>
-                  <li>Market size and growth validation</li>
-                  <li>Company comparison and benchmarking</li>
-                  <li>Investment memo generation with evidence-based recommendations</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-lg font-medium text-gray-800 mb-1">Business Value:</h4>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>85% reduction in due diligence research time</li>
-                  <li>75% faster creation of investment documentation</li>
-                  <li>More rigorous validation of investment hypotheses</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 bg-white rounded-lg shadow-md border border-gray-200 flex flex-col h-[600px] overflow-hidden">
-          <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-            <h3 className="font-medium text-gray-900">Expert Validation Assistant</h3>
-            <div className="text-xs text-gray-500 px-2 py-1 bg-gray-200 rounded-full">Powered by Accenture KnowledgeGraph</div>
-          </div>
+          ))}
           
-          <div className="flex-grow overflow-y-auto p-4 space-y-4">
-            {messages.map((msg, index) => (
-              <div 
-                key={index} 
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div 
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                    msg.role === 'user' 
-                      ? 'bg-gray-200 text-gray-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="bg-gray-100 rounded-lg px-4 py-3">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-100"></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-200"></div>
                 </div>
               </div>
-            ))}
-            
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-gray-100 rounded-lg px-4 py-2">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-100"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-200"></div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
-          
-          <div className="p-4 border-t border-gray-200 bg-gray-50">
-            <div className="flex space-x-2">
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask for validation on investment thesis, technology claims, or market sizing..."
-                className="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-none overflow-hidden"
-                rows={2}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!message.trim() || isTyping}
-                className={`p-2 rounded-md ${
-                  !message.trim() || isTyping
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-800 text-white hover:bg-gray-700'
-                } transition-colors duration-150`}
-              >
-                <MessageSquare className="h-5 w-5" />
-              </button>
             </div>
-            <div className="mt-2 text-xs text-gray-500">
-              Try: "What are the key risks I should validate for Anthropic?" or "Is Anthropic's valuation justified?"
-            </div>
-          </div>
+          )}
         </div>
         
-        <div className="lg:col-span-2 flex flex-col space-y-6">
-          <div className="bg-white rounded-lg shadow-card p-6 border border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Validation Progress</h3>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-1">
-                  <div className="text-sm text-gray-600">Technical Claims</div>
-                  <div className="text-sm font-medium text-gray-900">4/5 validated</div>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div className="bg-gray-800 h-2 rounded-full" style={{ width: '80%' }}></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex justify-between mb-1">
-                  <div className="text-sm text-gray-600">Market Size</div>
-                  <div className="text-sm font-medium text-gray-900">3/3 validated</div>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div className="bg-gray-800 h-2 rounded-full" style={{ width: '100%' }}></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex justify-between mb-1">
-                  <div className="text-sm text-gray-600">Team Background</div>
-                  <div className="text-sm font-medium text-gray-900">5/5 validated</div>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div className="bg-gray-800 h-2 rounded-full" style={{ width: '100%' }}></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex justify-between mb-1">
-                  <div className="text-sm text-gray-600">Financials</div>
-                  <div className="text-sm font-medium text-gray-900">2/4 validated</div>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div className="bg-gray-800 h-2 rounded-full" style={{ width: '50%' }}></div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-4 p-3 bg-gray-50 rounded-md">
-              <div className="text-xs flex justify-between text-gray-500">
-                <span>Overall Validation: 14/17 items</span>
-                <span className="font-medium">82% Complete</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-card p-6 border border-gray-200 flex-grow">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Documentation</h3>
-              <button className="text-sm text-gray-600 hover:text-gray-900">
-                View All
-              </button>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                <div className="flex items-start">
-                  <FileCheck className="h-5 w-5 text-gray-500 mr-3 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-gray-900 text-sm">Investment Memo</h4>
-                    <p className="text-xs text-gray-500 mt-1">Generated from validation analysis</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                <div className="flex items-start">
-                  <FileCheck className="h-5 w-5 text-gray-500 mr-3 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-gray-900 text-sm">Technical Due Diligence Report</h4>
-                    <p className="text-xs text-gray-500 mt-1">AI safety and capabilities assessment</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                <div className="flex items-start">
-                  <FileCheck className="h-5 w-5 text-gray-500 mr-3 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-gray-900 text-sm">Market Size Verification</h4>
-                    <p className="text-xs text-gray-500 mt-1">Third-party data comparison</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                <div className="flex items-start">
-                  <FileCheck className="h-5 w-5 text-gray-500 mr-3 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-gray-900 text-sm">Competitive Analysis</h4>
-                    <p className="text-xs text-gray-500 mt-1">Landscape and differentiation report</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <button className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                <Download className="h-4 w-4 mr-2" />
-                Export Complete Analysis
-              </button>
-            </div>
+        <div className="border-t border-gray-200 p-4 bg-gray-50">
+          <div className="flex space-x-2">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask about AI companies, valuations, risks, or competitive positioning..."
+              className="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-none"
+              rows={2}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!input.trim() || isTyping}
+              className={`p-2 rounded-md ${
+                !input.trim() || isTyping
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-800 text-white hover:bg-gray-700'
+              } transition-colors duration-150 flex items-center justify-center`}
+            >
+              {isTyping ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
+            </button>
           </div>
         </div>
       </div>
